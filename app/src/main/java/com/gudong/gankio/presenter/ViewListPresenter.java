@@ -25,14 +25,17 @@ import com.gudong.gankio.data.PrettyGirlData;
 import com.gudong.gankio.data.entity.Girl;
 import com.gudong.gankio.data.休息视频Data;
 import com.gudong.gankio.ui.view.IViewListView;
+import com.orhanobut.logger.Logger;
 
 import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.android.schedulers.HandlerScheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 /**
  * 首页视图控制器
@@ -78,9 +81,11 @@ public class ViewListPresenter extends BasePresenter<IViewListView>{
                         return createGirlInfoWith休息视频(prettyGirlData,休息视频Data);
                     }
                 })
+                .subscribeOn(HandlerScheduler.from(handler))
                 .map(new Func1<PrettyGirlData, List<Girl>>() {
                     @Override
                     public List<Girl> call(PrettyGirlData prettyGirlData) {
+                        Logger.d(Thread.currentThread().getName());
                         return prettyGirlData.results;
                     }
                 })
@@ -135,15 +140,18 @@ public class ViewListPresenter extends BasePresenter<IViewListView>{
                         return createGirlInfoWith休息视频(prettyGirlData,休息视频Data);
                     }
                 })
+                .subscribeOn(HandlerScheduler.from(handler))
                 .map(new Func1<PrettyGirlData, List<Girl>>() {
                     @Override
                     public List<Girl> call(PrettyGirlData prettyGirlData) {
+                        Logger.d(Thread.currentThread().getName());
                         return prettyGirlData.results;
                     }
                 })
                 .flatMap(new Func1<List<Girl>, Observable<Girl>>() {
                     @Override
                     public Observable<Girl> call(List<Girl> girls) {
+                        Logger.d(Thread.currentThread().getName());
                         return Observable.from(girls);
                     }
                 })

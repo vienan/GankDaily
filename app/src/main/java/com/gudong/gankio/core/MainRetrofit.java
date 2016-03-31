@@ -21,13 +21,12 @@ package com.gudong.gankio.core;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.squareup.okhttp.OkHttpClient;
 
-import java.util.concurrent.TimeUnit;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-import retrofit.RestAdapter;
-import retrofit.client.OkClient;
-import retrofit.converter.GsonConverter;
 
 /**
  * Created by GuDong on 15/10/8.
@@ -41,14 +40,13 @@ public class MainRetrofit {
 
     MainRetrofit() {
         OkHttpClient client = new OkHttpClient();
-        client.setReadTimeout(21, TimeUnit.SECONDS);
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setClient(new OkClient(client))
-                .setEndpoint(MainFactory.HOST)
-                .setConverter(new GsonConverter(gson))
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(client)
+                .baseUrl(MainFactory.HOST)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
-        mService = restAdapter.create(GuDong.class);
+        mService = retrofit.create(GuDong.class);
     }
 
     public GuDong getService(){

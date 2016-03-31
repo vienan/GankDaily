@@ -20,12 +20,14 @@
 package com.gudong.gankio.presenter;
 
 import android.app.Activity;
+import android.os.HandlerThread;
 
 import com.gudong.gankio.BuildConfig;
 import com.gudong.gankio.data.GankData;
 import com.gudong.gankio.data.entity.Gank;
 import com.gudong.gankio.ui.view.IMainView;
 import com.gudong.gankio.util.AndroidUtils;
+import com.orhanobut.logger.Logger;
 import com.umeng.update.UmengUpdateAgent;
 
 import java.util.ArrayList;
@@ -33,9 +35,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import rx.Scheduler;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.android.schedulers.HandlerScheduler;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * the Presenter of MainActivity
@@ -92,10 +97,11 @@ public class MainPresenter extends BasePresenter<IMainView> {
         int month = calendar.get(Calendar.MONTH)+1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         mGuDong.getGankData(year, month, day)
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(HandlerScheduler.from(handler))
                 .map(new Func1<GankData, GankData.Result>() {
                     @Override
                     public GankData.Result call(GankData gankData) {
+                        Logger.d(Thread.currentThread().getName());
                         return gankData.results;
                     }
                 })
@@ -105,11 +111,12 @@ public class MainPresenter extends BasePresenter<IMainView> {
                         return addAllResults(result);
                     }
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Gank>>() {
                     @Override
                     public void onCompleted() {
                         // after get data complete, need put off time one day
-                        mCurrentDate = new Date(date.getTime()-DAY_OF_MILLISECOND);
+                        mCurrentDate = new Date(date.getTime() - DAY_OF_MILLISECOND);
                     }
 
                     @Override
@@ -120,7 +127,7 @@ public class MainPresenter extends BasePresenter<IMainView> {
                     public void onNext(List<Gank> list) {
                         // some day the data will be return empty like sunday, so we need get after day data
                         if (list.isEmpty()) {
-                            getData(new Date(date.getTime()-DAY_OF_MILLISECOND));
+                            getData(new Date(date.getTime() - DAY_OF_MILLISECOND));
                         } else {
                             mCountOfGetMoreDataEmpty = 0;
                             mView.fillData(list);
@@ -137,7 +144,7 @@ public class MainPresenter extends BasePresenter<IMainView> {
         int month = calendar.get(Calendar.MONTH)+1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         mGuDong.getGankData(year, month, day)
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(HandlerScheduler.from(handler))
                 .map(new Func1<GankData, GankData.Result>() {
                     @Override
                     public GankData.Result call(GankData gankData) {
@@ -150,11 +157,12 @@ public class MainPresenter extends BasePresenter<IMainView> {
                         return addAllResults(result);
                     }
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Gank>>() {
                     @Override
                     public void onCompleted() {
                         // after get data complete, need put off time one day
-                        mCurrentDate = new Date(mCurrentDate.getTime()-DAY_OF_MILLISECOND);
+                        mCurrentDate = new Date(mCurrentDate.getTime() - DAY_OF_MILLISECOND);
                         // now user has execute getMoreData so this flag will be set true
                         //and now when user pull down list we would not refill data
                         hasLoadMoreData = true;
@@ -172,9 +180,9 @@ public class MainPresenter extends BasePresenter<IMainView> {
                             //record count of empty day
                             mCountOfGetMoreDataEmpty += 1;
                             //if empty day is more than five,it indicate has no more data to show
-                            if(mCountOfGetMoreDataEmpty>=5){
+                            if (mCountOfGetMoreDataEmpty >= 5) {
                                 mView.hasNoMoreData();
-                            }else{
+                            } else {
                                 // we need look forward data
                                 getDataMore();
                             }

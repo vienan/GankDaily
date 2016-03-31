@@ -20,6 +20,8 @@
 package com.gudong.gankio.presenter;
 
 import android.app.Activity;
+import android.os.Handler;
+import android.os.HandlerThread;
 
 import com.gudong.gankio.core.GuDong;
 import com.gudong.gankio.core.MainFactory;
@@ -39,8 +41,15 @@ public class BasePresenter<GV extends IBaseView> {
 
     public static final GuDong mGuDong = MainFactory.getGuDongInstance();
 
+    protected Handler handler;
+
     public BasePresenter(Activity context, GV view) {
         mContext = context;
         mView = view;
+
+        HandlerThread thread=new HandlerThread("baseThread");
+        thread.start();
+        handler=new Handler(thread.getLooper());
+
     }
 }
