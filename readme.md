@@ -1,5 +1,5 @@
 
-[ReadMe](https://github.com/maoruibin/GankDaily/blob/master/readme.md)
+
 
 ###扩展内容:
 
