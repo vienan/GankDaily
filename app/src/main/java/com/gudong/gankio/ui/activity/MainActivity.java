@@ -36,6 +36,8 @@ import com.gudong.gankio.ui.view.IMainView;
 import com.gudong.gankio.util.DateUtil;
 import com.gudong.gankio.util.DialogUtil;
 
+import org.joda.time.DateTime;
+
 import java.util.Date;
 import java.util.List;
 
@@ -181,7 +183,7 @@ public class MainActivity extends BaseSwipeRefreshActivity<MainPresenter> implem
     }
 
     private void getData() {
-        mPresenter.getData(new Date(System.currentTimeMillis()));
+        mPresenter.getData(DateTime.now());
     }
 
 
