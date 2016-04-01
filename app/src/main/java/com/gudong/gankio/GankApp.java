@@ -25,6 +25,8 @@ import android.content.Context;
 import com.orhanobut.logger.LogLevel;
 import com.orhanobut.logger.Logger;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 /**
  * Created by GuDong on 10/14/15 23:42.
  * Contact with gudong.name@gmail.com.
@@ -41,5 +43,6 @@ public class GankApp extends Application {
         }else{
             Logger.init("Gank").setLogLevel(LogLevel.NONE);
         }
+        JodaTimeAndroid.init(sContext);
     }
 }
